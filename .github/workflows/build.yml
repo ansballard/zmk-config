@@ -31,12 +31,12 @@ jobs:
           rm $OUTPUT_DIR/$QMK_KEYMAP_PATH.png
       - name: Commit Viz
         run: |
-          #if git diff --exit-code $OUTPUT_DIR; then
-          #  echo 'Visuals are unchanged, exiting...'
-          #else
+          if git diff --exit-code $OUTPUT_DIR; then
+            echo 'Visuals are unchanged, exiting...'
+          else
             git config --global user.email "$GIT_EMAIL"
             git config --global user.name "$GIT_NAME"
             git add $OUTPUT_DIR
             git commit -n -m "🤖 generated visuals via zmk-viewer"
             git push origin $GITHUB_REF_NAME
-          #fi
+          fi
