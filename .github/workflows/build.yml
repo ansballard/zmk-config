@@ -1,5 +1,42 @@
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+   uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+  generate-views:
+    runs-on: ubuntu-latest
+    env:
+      ZMK_VIEWER_VERSION: 1.1.0
+      KEYMAP_NAME: sofle
+      QMK_KEYMAP_PATH: sofle/keyhive
+      GIT_EMAIL: ans.ballard@gmail.com
+      GIT_NAME: Aaron Ballard
+      OUTPUT_DIR: ./viz
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download zmk-viewer
+        run: |
+          curl -0 -L https://github.com/MrMarble/zmk-viewer/releases/download/v$ZMK_VIEWER_VERSION/zmk-viewer-$ZMK_VIEWER_VERSION-linux-amd64.tar.gz --output zmk.tar.gz
+          tar -xzf zmk.tar.gz
+          mv zmk-viewer-*/zmk-viewer ./
+          chmod +x zmk-viewer
+          rm -rf ./zmk-viewer-* ./zmk.tar.gz
+      - name: Generate Viz
+        run: |
+          mkdir -p $OUTPUT_DIR/$KEYMAP_NAME
+          ./zmk-viewer generate -f ./config/$KEYMAP_NAME.keymap -o $OUTPUT_DIR $QMK_KEYMAP_PATH
+          rm $OUTPUT_DIR/$QMK_KEYMAP_PATH.png
+      - name: Commit Viz
+        run: |
+          if git diff --exit-code $OUTPUT_DIR; then
+            echo 'Visuals are unchanged, exiting...'
+          else
+            git config --global user.email "$GIT_EMAIL"
+            git config --global user.name "$GIT_NAME"
+            git add $OUTPUT_DIR
+            git commit -n -m "🤖 generated visuals via zmk-viewer"
+            git push origin $GITHUB_REF_NAME
+          fi
