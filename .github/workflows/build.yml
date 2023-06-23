@@ -10,7 +10,7 @@ jobs:
   generate-views:
     runs-on: ubuntu-latest
     env:
-      ZMK_VIEWER_VERSION: 1.1.0
+      ZMK_VIEWER_VERSION: 1.5.0
       KEYMAP_NAME: sofle
       QMK_KEYMAP_PATH: sofle/keyhive
       GIT_EMAIL: ans.ballard@gmail.com
@@ -28,7 +28,7 @@ jobs:
       - name: Generate Viz
         run: |
           mkdir -p $OUTPUT_DIR/$KEYMAP_NAME
-          ./zmk-viewer generate -f ./config/$KEYMAP_NAME.keymap -o $OUTPUT_DIR $QMK_KEYMAP_PATH
+          ./zmk-viewer generate --transparent --unified -f ./config/$KEYMAP_NAME.keymap -o $OUTPUT_DIR $QMK_KEYMAP_PATH
           rm $OUTPUT_DIR/$QMK_KEYMAP_PATH.png
       - name: Commit Viz
         run: |
