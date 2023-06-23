@@ -29,7 +29,6 @@ jobs:
         run: |
           mkdir -p $OUTPUT_DIR/$KEYMAP_NAME
           ./zmk-viewer generate --transparent --unified -f ./config/$KEYMAP_NAME.keymap -o $OUTPUT_DIR $QMK_KEYMAP_PATH
-          rm $OUTPUT_DIR/$QMK_KEYMAP_PATH.png
       - name: Commit Viz
         run: |
           if git diff --exit-code $OUTPUT_DIR; then
